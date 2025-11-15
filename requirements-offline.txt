@@ -1,0 +1,9 @@
+# Requirements for Offline Token Counter
+# =====================================
+
+# Optional: For most accurate offline token counting
+# If not installed, will fallback to character-based estimation
+transformers>=4.30.0
+
+# No other dependencies required!
+# The script works standalone with just Python 3.12+
