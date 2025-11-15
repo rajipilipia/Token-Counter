@@ -210,6 +210,11 @@ class OfflineTokenCounter:
         if self.verbose:
             print(f"Found {len(files)} files\n", file=sys.stderr)
 
+        if len(files) == 0:
+            print(f"\nWARNING: No files matching '{pattern}' found in {directory}", file=sys.stderr)
+            print(f"Try using --pattern '*.*' to scan all files", file=sys.stderr)
+            print(f"Or --pattern '*.{{txt,md,py,js}}' for specific types\n", file=sys.stderr)
+
         # Process files
         results = []
         total_tokens = 0
