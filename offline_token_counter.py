@@ -381,14 +381,19 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # Count tokens in a single file
+  %(prog)s /path/to/file.txt
+  %(prog)s "G:/My Drive/document.txt"
+
   # Count tokens in directory (auto-detect best method)
   %(prog)s /path/to/directory
+  %(prog)s "G:/My Drive/Documents"
 
   # Use specific method
   %(prog)s /path/to/directory --method xenova
   %(prog)s /path/to/directory --method estimation
 
-  # Count specific file types
+  # Count specific file types in directory
   %(prog)s /path/to/directory --pattern "*.md"
 
   # Limit number of files (for testing)
@@ -400,7 +405,8 @@ Examples:
   # Save report to file
   %(prog)s /path/to/directory --output report.txt
 
-  # Windows path with spaces (use quotes)
+  # Windows paths with spaces (use quotes and forward slashes)
+  %(prog)s "G:/My Drive/Documents/file.txt"
   %(prog)s "G:/My Drive/Documents" --verbose
 
 Methods:
@@ -411,9 +417,9 @@ Methods:
     )
 
     parser.add_argument(
-        "directory",
+        "path",
         type=str,
-        help="Directory to scan for text files"
+        help="File or directory to scan for text files"
     )
 
     parser.add_argument(
@@ -457,32 +463,61 @@ Methods:
 
     args = parser.parse_args()
 
-    # Convert directory path (handle Windows paths with spaces)
-    directory = Path(args.directory)
+    # Convert path (handle Windows paths with spaces)
+    path = Path(args.path)
 
-    # Validate directory
-    if not directory.exists():
-        print(f"ERROR: Directory does not exist: {directory}", file=sys.stderr)
-        sys.exit(1)
-
-    if not directory.is_dir():
-        print(f"ERROR: Path is not a directory: {directory}", file=sys.stderr)
+    # Validate path exists
+    if not path.exists():
+        print(f"ERROR: Path does not exist: {path}", file=sys.stderr)
         sys.exit(1)
 
     # Create counter
     method = TokenCountMethod[args.method.upper()]
     counter = OfflineTokenCounter(method=method, verbose=args.verbose)
 
-    # Count tokens
-    report = counter.count_directory_tokens(
-        directory=directory,
-        pattern=args.pattern,
-        limit=args.limit,
-        verbose_progress=args.verbose
-    )
+    # Handle both files and directories
+    if path.is_file():
+        # Single file mode
+        if args.verbose:
+            print(f"\nProcessing single file: {path}", file=sys.stderr)
 
-    # Format report
-    report_text = format_report(report, show_files=args.show_files)
+        result = counter.count_file_tokens(path)
+
+        # Create a minimal report for single file
+        report = CounterReport(
+            directory=str(path.parent),
+            total_files=1,
+            total_tokens=result.tokens,
+            total_characters=result.characters,
+            total_words=result.words,
+            total_lines=result.lines,
+            avg_tokens_per_file=result.tokens,
+            avg_chars_per_token=result.chars_per_token,
+            method=counter.actual_method,
+            files=[result],
+            processing_time=0.0
+        )
+
+        # Format report
+        report_text = format_report(report, show_files=True)
+
+    elif path.is_dir():
+        # Directory mode (existing behavior)
+        if args.verbose:
+            print(f"\nScanning directory: {path}", file=sys.stderr)
+
+        report = counter.count_directory_tokens(
+            directory=path,
+            pattern=args.pattern,
+            limit=args.limit,
+            verbose_progress=args.verbose
+        )
+
+        # Format report
+        report_text = format_report(report, show_files=args.show_files)
+    else:
+        print(f"ERROR: Path is neither file nor directory: {path}", file=sys.stderr)
+        sys.exit(1)
 
     # Output report
     if args.output:

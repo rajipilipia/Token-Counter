@@ -31,6 +31,8 @@ Count Claude AI tokens for text files with two powerful methods:
 - ✅ **Two methods** - Xenova tokenizer OR character estimation
 - ✅ **Standalone** - Minimal dependencies
 - ✅ **Fast** - Process thousands of files quickly
+- ✅ **Path agnostic** - Works with files OR directories
+- ✅ **Windows batch files** - Drag-and-drop support for Windows users
 
 ### API Counter Specific
 - ✅ **100% accurate** - Official Anthropic API
@@ -48,11 +50,24 @@ cd Token-Counter
 
 # Option 1: With Xenova tokenizer (most accurate offline)
 pip install transformers
-python offline_token_counter.py /path/to/directory
+python offline_token_counter.py /path/to/file_or_directory
 
 # Option 2: Pure estimation (no dependencies)
-python offline_token_counter.py /path/to/directory --method estimation
+python offline_token_counter.py /path/to/file_or_directory --method estimation
 ```
+
+### Windows Users - Drag and Drop!
+
+**Easiest way for Windows:**
+
+1. Drag and drop ANY file or folder onto:
+   - `count_tokens.bat` (auto-detect best method)
+   - `count_tokens_xenova.bat` (most accurate)
+   - `count_tokens_estimate.bat` (fastest, no dependencies)
+
+2. View results instantly!
+
+**See [WINDOWS_USAGE.md](WINDOWS_USAGE.md) for complete Windows guide.**
 
 ### Full Setup (Both Counters)
 
@@ -73,20 +88,28 @@ export ANTHROPIC_API_KEY=your-api-key-here
 
 ### Offline Counter (Recommended for Quick Estimates)
 
-```bash
-# Basic usage - auto-detect best method
-python offline_token_counter.py /path/to/directory
+**Works with ANY file or directory path!**
 
-# Your email directory example
+```bash
+# Count tokens in a single file
+python offline_token_counter.py /path/to/file.txt
+python offline_token_counter.py "G:/My Drive/document.txt"
+
+# Count tokens in a directory
+python offline_token_counter.py /path/to/directory
 python offline_token_counter.py "G:/My Drive/Google AI Studio/Logan Stone/Rock Center_TSQ/CPM/context/Emails"
 
 # With options
-python offline_token_counter.py /path/to/directory --show-files --verbose
-python offline_token_counter.py /path/to/directory --method estimation  # No dependencies
-python offline_token_counter.py /path/to/directory --pattern "*.md"     # Markdown files
-python offline_token_counter.py /path/to/directory --limit 10            # Test first
-python offline_token_counter.py /path/to/directory --output report.txt  # Save report
+python offline_token_counter.py /path --show-files --verbose
+python offline_token_counter.py /path --method estimation  # No dependencies
+python offline_token_counter.py /path --method xenova      # Most accurate
+python offline_token_counter.py /dir --pattern "*.md"      # Markdown files in directory
+python offline_token_counter.py /dir --limit 10            # Test with 10 files
+python offline_token_counter.py /path --output report.txt  # Save report
 ```
+
+**Windows Users - Use Drag and Drop!**
+- Drag ANY file/folder onto `count_tokens.bat` - See [WINDOWS_USAGE.md](WINDOWS_USAGE.md)
 
 **See [OFFLINE_USAGE.md](OFFLINE_USAGE.md) for complete offline counter documentation.**
 
@@ -215,9 +238,11 @@ Anthropic API rate limits by tier:
 ### Use Offline Counter When:
 - ✅ You want quick estimates without burning API tokens
 - ✅ Processing large directories (thousands of files)
+- ✅ Counting single files or entire folders
 - ✅ Development/testing phase
 - ✅ Cost is a concern
 - ✅ You don't have internet access
+- ✅ You're on Windows and want drag-and-drop ease
 
 ### Use API Counter When:
 - ✅ You need 100% accurate counts
@@ -253,9 +278,25 @@ Anthropic API rate limits by tier:
 
 - **Offline counter**: Token counts are estimates (75-95% accurate)
 - **API counter**: Token counts are exact (100% accurate)
+- **Path agnostic**: Both work with single files OR directories
 - Both skip files with encoding issues
 - Both use UTF-8 encoding by default
 - Both handle Windows paths with spaces
+- **Windows users**: Use `.bat` files for drag-and-drop ease!
+
+## Windows Batch Files
+
+Three convenient batch files for Windows users:
+
+| File | Method | Best For |
+|------|--------|----------|
+| `count_tokens.bat` | Auto | Most users - tries Xenova, falls back to estimation |
+| `count_tokens_xenova.bat` | Xenova | Maximum accuracy (requires transformers) |
+| `count_tokens_estimate.bat` | Estimation | Quick estimates (no dependencies) |
+
+**Usage:** Drag and drop ANY file or folder onto the `.bat` file!
+
+See [WINDOWS_USAGE.md](WINDOWS_USAGE.md) for complete Windows guide.
 
 ## Development
 
